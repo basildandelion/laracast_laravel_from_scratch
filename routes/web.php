@@ -17,7 +17,7 @@ Route::inertia('/contacts', 'public/Contacts', [
     'canRegister' => Features::enabled(Features::registration()),
 ])->name('contacts');
 
-Route::middleware(['auth', 'verified'])->group(function () {
+Route::middleware(['auth', 'verified'])->group(function (): void {
     Route::inertia('dashboard', 'Dashboard')->name('dashboard');
 });
 
