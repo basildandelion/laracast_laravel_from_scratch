@@ -8,13 +8,14 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\HigherOrderCollectionProxy;
 
 class Idea extends Model
 {
     use HasFactory;
 
     /**
-     * @var \Illuminate\Support\HigherOrderCollectionProxy|mixed
+     * @var HigherOrderCollectionProxy|mixed
      */
     protected $fillable = [
         'title',
@@ -25,11 +26,6 @@ class Idea extends Model
         'image_path',
     ];
 
-    protected $casts = [
-        'links' => AsArrayObject::class,
-        'status' => IdeaStatus::class,
-    ];
-
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
@@ -38,7 +34,8 @@ class Idea extends Model
     protected function casts(): array
     {
         return [
-            'links' => 'array',
+            'links' => AsArrayObject::class,
+            'status' => IdeaStatus::PENDING->value,
         ];
     }
 
@@ -48,6 +45,6 @@ class Idea extends Model
     }
 
     protected $attributes = [
-        'status' => IdeaStatus::PENDING,
+        'status' => IdeaStatus::PENDING->value,
     ];
 }
