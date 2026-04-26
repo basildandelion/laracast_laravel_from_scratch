@@ -7,7 +7,7 @@ import Navigation from '@/components/idea/navigation.vue';
         <header>
             <Navigation />
         </header>
-        <main class="mx-auto max-w-7xl px-6 pb-12">
+        <main class="mx-auto max-w-7xl px-6">
             <slot />
         </main>
     </div>

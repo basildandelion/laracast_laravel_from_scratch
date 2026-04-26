@@ -10,14 +10,11 @@ use Inertia\Response;
 
 class RegisteredUserController extends Controller
 {
-    public function index(): void {}
-
     public function create(): Response
     {
         $route = route('create.user');
         return Inertia::render('Auth/Register')->with('route', $route);
     }
-
     public function store(Request $request): RedirectResponse
     {
         $valid = $request->validate([
@@ -34,34 +31,27 @@ class RegisteredUserController extends Controller
         return redirect()->route('home')->with('message', 'User created successfully');
     }
 
-    public function show(User $user) {}
-
-    public function edit(User $user) {}
-
-    public function update(Request $request, User $user) {}
-
-    public function destroy(User $user) {}
-
-    public function logout(Request $request)
+    public function logout(Request $request): RedirectResponse
     {
         auth()->logout();
         return redirect()->route('home');
     }
 
-    public function login()
+    public function login(): Response
     {
         $route = route('login.user');
         return Inertia::render('Auth/Login')->with('route', $route);
     }
 
-    public function authorize(Request $request)
+    public function authorize(Request $request): RedirectResponse
     {
         $request->validate([
             'email' => 'required|email',
             'password' => 'required|string',
         ]);
         if (auth()->attempt(['email' => $request->email, 'password' => $request->password])) {
-            return redirect()->route('home');
+            $request->session()->regenerate();
+            return redirect()->intended(route('home'))->with('success', 'Login successful');
         }
         return redirect()->back()->withErrors(['email' => 'Invalid credentials'])->withInput();
     }
