@@ -9,8 +9,9 @@ return new class extends Migration {
     {
         Schema::create('steps', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('idea_id')->constrained('ideas')->cascadeOnDelete();
             $table->string('description');
-            $table->boolean('completed');
+            $table->boolean('completed')->default(false);
             $table->timestamps();
         });
     }

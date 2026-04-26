@@ -13,6 +13,9 @@ class Idea extends Model
 {
     use HasFactory;
 
+    /**
+     * @var \Illuminate\Support\HigherOrderCollectionProxy|mixed
+     */
     protected $fillable = [
         'title',
         'description',
