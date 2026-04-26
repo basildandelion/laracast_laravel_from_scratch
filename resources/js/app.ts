@@ -8,17 +8,16 @@ import { initializeFlashToast } from '@/lib/flashToast';
 const appName = import.meta.env.VITE_APP_NAME || 'IDEA';
 
 createInertiaApp({
-    title: (title) => (title ? `${title} - ${appName}` : appName),
     layout: (name) => {
         switch (true) {
             // case name.startsWith('public/'):
             //     return null;
-            // case name.startsWith('auth/'):
+            case name.startsWith('auth/'):
             //     return AuthLayout;
-            //     return null;
+                return null;
             // case name.startsWith('settings/'):
-                // return [AppLayout, SettingsLayout];
-                // return null;
+            // return [AppLayout, SettingsLayout];
+            // return null;
             default:
                 return Layout;
         }
@@ -26,6 +25,7 @@ createInertiaApp({
     progress: {
         color: '#4B5563',
     },
+    title: (title) => (title ? `${title} - ${appName}` : appName),
 });
 
 // This will set light / dark mode on page load...
