@@ -1,0 +1,41 @@
+<?php
+
+namespace App\Policies;
+
+use App\Models\Idea;
+use App\Models\User;
+use Illuminate\Auth\Access\HandlesAuthorization;
+
+class IdeaPolicy
+{
+    use HandlesAuthorization;
+
+    public function viewAny(User $user): bool
+    {
+
+    }
+
+    public function view(User $user, Idea $idea): bool
+    {
+    }
+
+    public function create(User $user): bool
+    {
+    }
+
+    public function update(User $user, Idea $idea): bool
+    {
+    }
+
+    public function delete(User $user, Idea $idea): bool
+    {
+    }
+
+    public function restore(User $user, Idea $idea): bool
+    {
+    }
+
+    public function forceDelete(User $user, Idea $idea): bool
+    {
+    }
+}

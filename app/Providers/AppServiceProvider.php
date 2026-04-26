@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
+use Illuminate\Database\Eloquent\Model;
 use Override;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Date;
@@ -35,6 +36,8 @@ class AppServiceProvider extends ServiceProvider
      */
     protected function configureDefaults(): void
     {
+        Model::shouldBeStrict();
+        Model::automaticallyEagerLoadRelationships();
         Date::use(CarbonImmutable::class);
 
         DB::prohibitDestructiveCommands(
