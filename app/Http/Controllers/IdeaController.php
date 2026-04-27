@@ -3,8 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\IdeaRequest;
+use App\Http\Resources\IdeaResource;
 use App\Models\Idea;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Support\Facades\Auth;
+use Inertia\Inertia;
 
 class IdeaController extends Controller
 {
@@ -14,7 +17,9 @@ class IdeaController extends Controller
     {
         $this->authorize('viewAny', Idea::class);
 
-        return Idea::all();
+        $ideas = Auth::user()->ideas()->paginate(10);
+
+        return Inertia::render('Ideas/Index', ['ideas' => IdeaResource::collection($ideas)]);
     }
 
     public function store(IdeaRequest $request)

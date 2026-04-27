@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Link, useForm, usePage } from '@inertiajs/vue3';
 import { computed } from 'vue';
-import { home, logout, register, authorization } from '@/routes';
+import { home, logout, register, login } from '@/routes';
 
 const page = usePage();
 const isAuthenticated = computed(() => !!page.props.auth?.user);
@@ -27,7 +27,7 @@ const handleSubmit = (event: Event) => {
             </div>
 
             <div v-if="!isAuthenticated" class="flex items-center gap-6">
-                <Link :href="authorization()">Sign in</Link>
+                <Link :href="login()">Sign in</Link>
                 <Link class="btn" :href="register()">Register</Link>
             </div>
             <div v-else>
@@ -36,7 +36,9 @@ const handleSubmit = (event: Event) => {
                     :action="logout()['url']"
                     method="POST"
                 >
-                    <button data-test="logout" class="btn" type="submit">Logout</button>
+                    <button data-test="logout" class="btn" type="submit">
+                        Logout
+                    </button>
                 </form>
             </div>
         </div>

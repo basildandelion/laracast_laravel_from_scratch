@@ -35,7 +35,7 @@ class Idea extends Model
     {
         return [
             'links' => AsArrayObject::class,
-            'status' => IdeaStatus::PENDING->value,
+            'status' => IdeaStatus::class,
         ];
     }
 

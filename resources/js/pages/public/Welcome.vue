@@ -17,10 +17,7 @@ withDefaults(
 </script>
 
 <template>
-    <Head title="MAIN PAGE">
-        <link rel="preconnect" href="https://rsms.me/" />
-        <link rel="stylesheet" href="https://rsms.me/inter/inter.css" />
-    </Head>
+    <Head title="MAIN PAGE" />
     <p>Hello World!</p>
     <FlashCard v-if="page.props.success" :message="page.props.success" />
 </template>
