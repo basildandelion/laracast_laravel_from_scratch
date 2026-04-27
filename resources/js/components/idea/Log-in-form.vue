@@ -55,7 +55,7 @@ const handleSubmit = (event: Event) => {
                     :errors="errors"
                     v-model="formData.password"
                 />
-                <button type="submit" class="btn btn-primary mt-6 w-full h-10">
+                <button type="submit" data-test="login" class="btn btn-primary mt-6 w-full h-10">
                     Log in
                 </button>
             </form>

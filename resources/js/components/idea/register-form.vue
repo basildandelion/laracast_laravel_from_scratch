@@ -73,7 +73,7 @@ const handleSubmit = (event: Event) => {
                     errors=""
                     v-model="formData.password_confirmation"
                 />
-                <button type="submit" class="btn btn-primary mt-6 w-full h-10">
+                <button data-test="register" type="submit" class="btn btn-primary mt-6 w-full h-10">
                     Register
                 </button>
             </form>

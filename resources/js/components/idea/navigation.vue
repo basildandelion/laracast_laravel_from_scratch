@@ -36,7 +36,7 @@ const handleSubmit = (event: Event) => {
                     :action="logout()['url']"
                     method="POST"
                 >
-                    <button class="btn" type="submit">Logout</button>
+                    <button data-test="logout" class="btn" type="submit">Logout</button>
                 </form>
             </div>
         </div>
