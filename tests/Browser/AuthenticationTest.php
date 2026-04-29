@@ -36,7 +36,7 @@ test('can logout a user', function () {
     $this->actingAs($user);
     visit('/')->
         click('@logout')
-        ->assertPathIs('/');
+            ->assertPathIs('/');
 
     $this->assertGuest();
 });

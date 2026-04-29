@@ -20,6 +20,7 @@
     "require-dev": {
         "driftingly/rector-laravel": "^2.3",
         "fakerphp/faker": "^1.24",
+        "fruitcake/laravel-debugbar": "^4.2",
         "laravel/boost": "^2.4",
         "laravel/pail": "^1.2.5",
         "laravel/pint": "^1.27",
@@ -92,7 +93,12 @@
         "pre-package-uninstall": [
             "Illuminate\\Foundation\\ComposerScripts::prePackageUninstall"
         ],
-        "rector": "vendor/bin/rector"
+        "rector": "vendor/bin/rector",
+        "format": [
+            "rector",
+            "pint --parallel"
+
+        ]
     },
     "extra": {
         "laravel": {

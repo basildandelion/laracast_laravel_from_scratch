@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Policies;
 
 use App\Models\Idea;
@@ -20,23 +22,13 @@ class IdeaPolicy
         return $user->id === $idea->user_id;
     }
 
-    public function create(User $user): bool
-    {
-    }
+    public function create(User $user): bool {}
 
-    public function update(User $user, Idea $idea): bool
-    {
-    }
+    public function update(User $user, Idea $idea): bool {}
 
-    public function delete(User $user, Idea $idea): bool
-    {
-    }
+    public function delete(User $user, Idea $idea): bool {}
 
-    public function restore(User $user, Idea $idea): bool
-    {
-    }
+    public function restore(User $user, Idea $idea): bool {}
 
-    public function forceDelete(User $user, Idea $idea): bool
-    {
-    }
+    public function forceDelete(User $user, Idea $idea): bool {}
 }

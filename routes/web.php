@@ -20,4 +20,3 @@ Route::middleware('auth')->group(function () {
     Route::post('logout', [RegisteredUserController::class, 'logout'])->name('logout');
     Route::resource('ideas', IdeaController::class);
 });
-
