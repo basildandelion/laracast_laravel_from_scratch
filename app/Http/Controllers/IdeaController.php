@@ -40,11 +40,18 @@ class IdeaController extends Controller
         return Idea::create($request->validated());
     }
 
-    public function show(Idea $idea): Idea
+    public function edit(Idea $idea): Response
+    {
+        $this->authorize('update', $idea);
+
+        return Inertia::render('Ideas/Edit', ['idea' => new IdeaResource($idea)]);
+    }
+
+    public function show(Idea $idea): Response
     {
         $this->authorize('view', $idea);
 
-        return $idea;
+        return Inertia::render('Ideas/Show', ['idea' => new IdeaResource($idea)]);
     }
 
     public function update(IdeaRequest $request, Idea $idea): Idea
