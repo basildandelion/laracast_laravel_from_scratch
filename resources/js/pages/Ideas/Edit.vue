@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ChevronDownIcon } from '@heroicons/vue/16/solid';
-import { PhotoIcon, UserCircleIcon } from '@heroicons/vue/24/solid';
+import { PhotoIcon } from '@heroicons/vue/24/solid';
 import { Head, useForm } from '@inertiajs/vue3';
 
 interface Data {
@@ -141,19 +141,11 @@ const form = useForm({
                     </div>
                 </div>
             </div>
-
         </div>
 
         <div class="mt-6 flex items-center justify-end gap-x-6">
-            <button type="button" class="btn btn-outlined">
-                Cancel
-            </button>
-            <button
-                type="submit"
-                class="btn"
-            >
-                Save
-            </button>
+            <button type="button" class="btn btn-outlined">Cancel</button>
+            <button type="submit" class="btn">Save</button>
         </div>
     </form>
     {{ idea.data }}

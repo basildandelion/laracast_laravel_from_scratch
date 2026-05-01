@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Enums\IdeaStatus;
 use App\Http\Requests\IdeaRequest;
 use App\Http\Resources\IdeaResource;
 use App\Models\Idea;
@@ -21,14 +22,16 @@ class IdeaController extends Controller
     {
         $this->authorize('viewAny', Idea::class);
         $user = Auth::user();
+        $status = $request->query('status');
+        $requestedStatus = is_string($status) && in_array($status, IdeaStatus::values(), true)
+            ? $status
+            : 'all';
 
         $ideas = $user->ideas()
-            ->when($request->query('status'), fn ($query, $status) => $query->where('status', $status))
+            ->when($requestedStatus !== 'all', fn ($query) => $query->where('status', $requestedStatus))
             ->paginate(10);
 
         $counts = Idea::countByStatus($user);
-
-        $requestedStatus = $request->query('status', 'all');
 
         return Inertia::render('Ideas/Index', ['items' => IdeaResource::collection($ideas), 'counts' => $counts, 'requestedStatus' => $requestedStatus]);
     }
