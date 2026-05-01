@@ -1,16 +1,48 @@
 <script setup lang="ts">
-import { Head, Link } from '@inertiajs/vue3';
+import { ArrowLeftIcon } from '@heroicons/vue/24/outline';
+import { Head, Link, useForm } from '@inertiajs/vue3';
 import StatusLabel from '@/pages/Ideas/StatusLabel.vue';
 import ideas from '@/routes/ideas';
 
-defineProps<{
-    idea: any;
+interface Data {
+    id: number;
+    title: string;
+    description: string;
+    created_at: string;
+    status: string;
+    links: Array<{ text: string; url: string }>;
+    image_path: string;
+}
+
+interface Idea {
+    data: Data;
+}
+
+const props = defineProps<{
+    idea: Idea;
 }>();
+
+const deleteIdea = (event: Event) => {
+    event.preventDefault();
+
+    if (confirm('Are you sure you want to delete this idea?')) {
+        const form = useForm();
+        form.delete(ideas.destroy.url(props.idea.data.id));
+    }
+};
 </script>
 
 <template>
     <Head :title="idea.data.title" />
-    <div class="overflow-hidden bg-gray-900 py-24 sm:py-32">
+    <div class="relative mt-2 overflow-hidden bg-gray-900 py-24 sm:py-32">
+        <div class="absolute top-4 left-4">
+            <Link
+                :href="ideas.index()"
+                class="flex items-center text-gray-400 transition-colors hover:text-white gap-x-2"
+            >
+                <ArrowLeftIcon class="h-6 w-6" /> Back to ideas
+            </Link>
+        </div>
         <div class="mx-auto max-w-7xl px-6 lg:px-8">
             <div
                 class="mx-auto grid max-w-2xl grid-cols-1 gap-x-8 gap-y-16 sm:gap-y-20 lg:mx-0 lg:max-w-none lg:grid-cols-2"
@@ -32,13 +64,28 @@ defineProps<{
                             {{ idea.data.created_at }}
                         </div>
                         <ul v-if="idea.data.links">
-                            <li v-for="link in idea.data.links" :key="link.id">
+                            <li
+                                v-for="(link, index) in idea.data.links"
+                                :key="index"
+                            >
                                 <a :href="link.url" class="text-indigo-400">{{
                                     link.text
                                 }}</a>
                             </li>
                         </ul>
-                        <Link class="btn mt-4" :href="ideas.edit(idea.data.id)"> Edit </Link>
+                        <div class="mt-4 flex gap-x-5">
+                            <Link class="btn" :href="ideas.edit(idea.data.id)">
+                                Edit
+                            </Link>
+                            <form @submit="deleteIdea">
+                                <button
+                                    type="submit"
+                                    class="btn border border-red-900/80 bg-red-400"
+                                >
+                                    Delete
+                                </button>
+                            </form>
+                        </div>
                     </div>
                 </div>
                 <img
@@ -47,7 +94,7 @@ defineProps<{
                     height="1442"
                     :src="idea.data.image_path"
                     :alt="idea.data.title"
-                    class="w-3xl max-w-none rounded-xl shadow-xl ring-1 ring-white/10 sm:w-228 md:-ml-4 lg:-ml-0"
+                    class="w-3xl max-w-none rounded-xl shadow-xl ring-1 ring-white/10 sm:w-228 md:-ml-4 lg:ml-0"
                 />
             </div>
         </div>

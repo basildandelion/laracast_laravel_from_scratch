@@ -69,6 +69,6 @@ class IdeaController extends Controller
 
         $idea->delete();
 
-        return response()->json();
+        return redirect()->route('ideas.index')->with('success', 'Idea deleted successfully.');
     }
 }

@@ -22,15 +22,28 @@ class IdeaPolicy
         return $user->id === $idea->user_id;
     }
 
-    public function create(User $user): bool {}
+    public function create(User $user): bool
+    {
+        return true;
+    }
 
-    public function update(User $user, Idea $idea): bool {
+    public function update(User $user, Idea $idea): bool
+    {
         return $user->id === $idea->user_id;
     }
 
-    public function delete(User $user, Idea $idea): bool {}
+    public function delete(User $user, Idea $idea): bool
+    {
+        return $idea->user_id === $user->id;
+    }
 
-    public function restore(User $user, Idea $idea): bool {}
+    public function restore(User $user, Idea $idea): bool
+    {
+        return $idea->user_id === $user->id;
+    }
 
-    public function forceDelete(User $user, Idea $idea): bool {}
+    public function forceDelete(User $user, Idea $idea): bool
+    {
+        return $idea->user_id === $user->id;
+    }
 }
