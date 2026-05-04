@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Middleware;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Inertia\Middleware;
 use Override;
 
@@ -40,6 +41,12 @@ class HandleInertiaRequests extends Middleware
     #[Override]
     public function share(Request $request): array
     {
+        $flash = [
+            'success' => $request->session()->get('success'),
+            'message' => $request->session()->get('message'),
+            'error' => $request->session()->get('error'),
+        ];
+
         return [
             ...parent::share($request),
             'name' => config('app.name'),
@@ -47,9 +54,12 @@ class HandleInertiaRequests extends Middleware
                 'user' => $request->user(),
             ],
             'csrf_token' => csrf_token(),
-            'success' => $request->session()->get('success'),
-            'message' => $request->session()->get('message'),
-            'error' => $request->session()->get('error'),
+            'flash' => [
+                'id' => collect($flash)->filter(fn (mixed $message): bool => filled($message))->isNotEmpty()
+                    ? (string) Str::uuid()
+                    : null,
+                ...$flash,
+            ],
         ];
     }
 }

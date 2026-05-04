@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import Navigation from '@/components/idea/navigation.vue';
+import FlashCard from '@/pages/public/FlashCard.vue';
 </script>
 
 <template>
@@ -10,6 +11,7 @@ import Navigation from '@/components/idea/navigation.vue';
         <main class="mx-auto max-w-7xl px-6">
             <slot />
         </main>
+        <FlashCard />
     </div>
 </template>
 

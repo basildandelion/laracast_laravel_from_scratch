@@ -9,6 +9,7 @@ use App\Http\Requests\IdeaRequest;
 use App\Http\Resources\IdeaResource;
 use App\Models\Idea;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
@@ -28,19 +29,31 @@ class IdeaController extends Controller
             : 'all';
 
         $ideas = $user->ideas()
-            ->when($requestedStatus !== 'all', fn ($query) => $query->where('status', $requestedStatus))
+            ->when($requestedStatus !== 'all', fn ($query) => $query->where('status', $requestedStatus))->latest()
             ->paginate(10);
 
         $counts = Idea::countByStatus($user);
+        $statuses = IdeaStatus::cases();
 
-        return Inertia::render('Ideas/Index', ['items' => IdeaResource::collection($ideas), 'counts' => $counts, 'requestedStatus' => $requestedStatus]);
+        return Inertia::render('Ideas/Index', ['items' => IdeaResource::collection($ideas), 'counts' => $counts, 'requestedStatus' => $requestedStatus, 'statuses' => $statuses]);
     }
 
-    public function store(IdeaRequest $request)
+    public function store(IdeaRequest $request): RedirectResponse
     {
         $this->authorize('create', Idea::class);
+        $validated = $request->validated();
+        $idea = [
+            'user_id' => Auth::id(),
+            'title' => $validated['title'],
+            'description' => $validated['description'],
+            'status' => $validated['status'],
+            'links' => $validated['links'],
+            'image_path' => $validated['image_path'],
+        ];
 
-        return Idea::create($request->validated());
+        Idea::create($idea);
+
+        return redirect()->route('ideas.index')->with('success', 'Idea created successfully.');
     }
 
     public function edit(Idea $idea): Response
@@ -66,12 +79,12 @@ class IdeaController extends Controller
         return $idea;
     }
 
-    public function destroy(Idea $idea)
+    public function destroy(Idea $idea): RedirectResponse
     {
         $this->authorize('delete', $idea);
 
         $idea->delete();
 
-        return redirect()->route('ideas.index')->with('success', 'Idea deleted successfully.');
+        return redirect()->route('ideas.index')->with('error', 'Idea deleted successfully.');
     }
 }

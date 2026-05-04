@@ -1,9 +1,6 @@
 <script setup lang="ts">
 // import { Head, Link } from '@inertiajs/vue3';
-import { Head, usePage } from '@inertiajs/vue3';
-import FlashCard from '@/pages/public/FlashCard.vue';
-
-const page = usePage();
+import { Head } from '@inertiajs/vue3';
 
 withDefaults(
     defineProps<{
@@ -19,5 +16,4 @@ withDefaults(
 <template>
     <Head title="MAIN PAGE" />
     <p>Hello World!</p>
-    <FlashCard v-if="page.props.success" :message="page.props.success" />
 </template>
