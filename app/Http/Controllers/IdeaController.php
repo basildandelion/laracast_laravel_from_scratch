@@ -47,7 +47,7 @@ class IdeaController extends Controller
             'title' => $validated['title'],
             'description' => $validated['description'],
             'status' => $validated['status'],
-            'links' => $validated['links'],
+            'links' => explode("\n", $validated['links']),
             'image_path' => $validated['image_path'],
         ];
 
@@ -56,27 +56,21 @@ class IdeaController extends Controller
         return redirect()->route('ideas.index')->with('success', 'Idea created successfully.');
     }
 
-    public function edit(Idea $idea): Response
-    {
-        $this->authorize('update', $idea);
-
-        return Inertia::render('Ideas/Edit', ['idea' => new IdeaResource($idea)]);
-    }
-
     public function show(Idea $idea): Response
     {
         $this->authorize('view', $idea);
+        $statuses = IdeaStatus::cases();
 
-        return Inertia::render('Ideas/Show', ['idea' => new IdeaResource($idea)]);
+        return Inertia::render('Ideas/Show', ['idea' => new IdeaResource($idea), 'statuses' => $statuses]);
     }
 
-    public function update(IdeaRequest $request, Idea $idea): Idea
+    public function update(IdeaRequest $request, Idea $idea): RedirectResponse
     {
         $this->authorize('update', $idea);
-
-        $idea->update($request->validated());
-
-        return $idea;
+        $data = $request->validated();
+        $data['links'] = explode("\n", $data['links']);
+        $idea->update($data);
+        return redirect()->back()->with('success', 'Idea updated successfully');
     }
 
     public function destroy(Idea $idea): RedirectResponse

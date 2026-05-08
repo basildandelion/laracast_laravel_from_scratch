@@ -19,7 +19,7 @@ class IdeaResource extends JsonResource
             'id' => $this->id,
             'title' => $this->title,
             'description' => $this->description,
-            'status' => $this->status->label(),
+            'status' => $this->status,
             'image_path' => $this->image_path,
             'links' => $this->links,
             'created_at' => $this->created_at->diffForHumans(),

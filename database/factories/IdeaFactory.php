@@ -13,13 +13,18 @@ class IdeaFactory extends Factory
 
     public function definition(): array
     {
+        $links = [];
+        for ($i = 0; $i < 5; $i++) {
+            $links[] = fake()->url();
+        }
+
         return [
             'title' => fake()->word(),
             'description' => fake()->text(),
-            'links' => fake()->url(),
+            'links' => $links,
             'created_at' => Carbon::now(),
             'updated_at' => Carbon::now(),
-            'image_path' => fake()->imageUrl(),
+            'image_path' => 'https://placehold.co/600x400',
             'user_id' => User::factory(),
         ];
     }
