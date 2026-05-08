@@ -53,20 +53,87 @@ const showCreateForm = () => {
 const closeCreateForm = () => {
     createModalOpened.value = false;
 };
-const form = useForm({
+const form = useForm<{
+    title: string;
+    description: string;
+    image_path: string;
+    links: string;
+    status: string;
+    image: File | null;
+}>({
     title: props.idea.data.title,
     description: props.idea.data.description,
     image_path: props.idea.data.image_path,
     links: props.idea.data.links.join('\n'),
     status: props.idea.data.status,
+    image: null,
 });
 const submitCreateForm = () => {
     form.patch(ideas.update.url(props.idea.data.id), {
+        forceFormData: true,
         preserveScroll: true,
         onSuccess: () => {
             closeCreateForm();
         },
     });
+};
+const isDragging = ref(false);
+const handleFileSelect = (event: Event) => {
+    const target = event.target as HTMLInputElement;
+
+    if (!target.files || !target.files.length) {
+        return;
+    }
+
+    handleFile(target.files[0]);
+};
+
+const handleDrop = (event: DragEvent) => {
+    isDragging.value = false;
+
+    if (!event.dataTransfer?.files.length) {
+        return;
+    }
+
+    handleFile(event.dataTransfer.files[0]);
+};
+const handleDragLeave = (event: DragEvent) => {
+    const currentTarget = event.currentTarget as HTMLElement;
+    const relatedTarget = event.relatedTarget as Node | null;
+
+    if (!currentTarget.contains(relatedTarget)) {
+        isDragging.value = false;
+    }
+};
+let previewUrl: string | null = null;
+
+const MAX_FILE_SIZE = 10 * 1024 * 1024;
+
+const handleFile = (file: File | null) => {
+    if (!file) {
+        return;
+    }
+
+    if (!file.type.startsWith('image/')) {
+        alert('Only image files are allowed.');
+
+        return;
+    }
+
+    if (file.size > MAX_FILE_SIZE) {
+        alert('File size must be under 10MB.');
+
+        return;
+    }
+
+    if (previewUrl) {
+        URL.revokeObjectURL(previewUrl);
+    }
+
+    previewUrl = URL.createObjectURL(file);
+
+    form.image = file;
+    form.image_path = previewUrl;
 };
 </script>
 
@@ -83,10 +150,15 @@ const submitCreateForm = () => {
         </div>
         <div class="mx-auto max-w-7xl px-6 lg:px-8">
             <div
-                class="mx-auto grid max-w-2xl grid-cols-1 gap-x-8 gap-y-16 sm:gap-y-20 lg:mx-0 lg:max-w-none lg:grid-cols-2"
+                :class="{
+                    'mx-auto grid max-w-2xl grid-cols-1 gap-x-8 gap-y-16 sm:gap-y-20 lg:mx-0 lg:max-w-none lg:grid-cols-2':
+                        idea.data.image_path,
+                    'mx-auto grid max-w-2xl grid-cols-1 gap-x-8 gap-y-16 sm:gap-y-20 lg:mx-0 lg:max-w-none lg:grid-cols-1':
+                        !idea.data.image_path,
+                }"
             >
                 <div class="lg:pt-4 lg:pr-8">
-                    <div class="lg:max-w-lg">
+                    <div :class="{ 'lg:max-w-lg': idea.data.image_path }">
                         <div class="mt-1">
                             <StatusLabel :status="idea.data.status" />
                         </div>
@@ -136,7 +208,7 @@ const submitCreateForm = () => {
                     v-if="idea.data.image_path"
                     width="2432"
                     height="1442"
-                    :src="idea.data.image_path"
+                    :src="'/storage/' + idea.data.image_path"
                     :alt="idea.data.title"
                     class="w-3xl max-w-none rounded-xl shadow-xl ring-1 ring-white/10 sm:w-228 md:-ml-4 lg:ml-0"
                 />
@@ -274,36 +346,60 @@ const submitCreateForm = () => {
                         </Listbox>
                     </div>
                     <div class="col-span-full">
-                        <label
-                            for="cover-photo"
-                            class="block text-sm/6 font-medium text-white"
-                            >Image</label
-                        >
+                        <label class="block text-sm/6 font-medium text-white">
+                            Image
+                        </label>
+
                         <div
-                            class="mt-2 flex justify-center rounded-lg border border-dashed border-white/25 px-6 py-10"
+                            class="mt-2 flex justify-center rounded-lg border border-dashed border-white/25 bg-gray-900 bg-cover bg-center px-6 py-10 transition"
+                            :class="{
+                                'border-primary bg-primary/10': isDragging,
+                                'bg-cover bg-center': form.image_path,
+                                'bg-gray-900': !form.image_path,
+                            }"
+                            :style="
+                                form.image_path
+                                    ? {
+                                          backgroundImage: `url(/storage/${form.image_path})`,
+                                      }
+                                    : {}
+                            "
+                            @dragenter.prevent="isDragging = true"
+                            @dragover.prevent="isDragging = true"
+                            @dragleave.prevent="handleDragLeave"
+                            @drop.prevent="handleDrop"
                         >
-                            <div class="text-center">
+                            <div
+                                class="rounded-md bg-primary/90 p-6 text-center"
+                            >
                                 <PhotoIcon
-                                    class="mx-auto size-12 text-gray-600"
+                                    v-if="!form.image_path"
+                                    class="mx-auto size-12 text-gray-300"
                                     aria-hidden="true"
                                 />
-                                <div class="mt-4 flex text-sm/6 text-gray-400">
+
+                                <div
+                                    class="mt-4 flex justify-center text-sm text-white"
+                                >
                                     <label
                                         for="file-upload"
-                                        class="relative cursor-pointer rounded-md bg-transparent font-semibold text-indigo-400 focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-indigo-500 hover:text-indigo-300"
+                                        class="cursor-pointer rounded-md font-semibold hover:text-indigo-300"
                                     >
-                                        <span>Upload a file</span>
-                                        <input
-                                            id="file-upload"
-                                            name="file-upload"
-                                            type="text"
-                                            class="sr-only"
-                                            v-model="form.image_path"
-                                        />
+                                        Upload a file
                                     </label>
+
+                                    <input
+                                        id="file-upload"
+                                        type="file"
+                                        accept="image/*"
+                                        class="sr-only"
+                                        @change="handleFileSelect"
+                                    />
+
                                     <p class="pl-1">or drag and drop</p>
                                 </div>
-                                <p class="text-xs/5 text-gray-400">
+
+                                <p class="text-xs/5 text-white">
                                     PNG, JPG, GIF up to 10MB
                                 </p>
                             </div>

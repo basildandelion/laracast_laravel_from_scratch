@@ -15,9 +15,9 @@ class IdeaRequest extends FormRequest
         return [
             'title' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string', 'max:10000'],
-            'links' => ['nullable'],
+            'links' => ['nullable', 'string', 'max:10000'],
             'status' => ['required', Rule::enum(IdeaStatus::class)],
-            'image_path' => ['nullable', 'string', 'max:255'],
+            'image' => ['nullable', 'image', 'max:10240'],
         ];
     }
 

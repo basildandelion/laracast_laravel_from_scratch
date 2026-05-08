@@ -12,6 +12,7 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -67,10 +68,32 @@ class IdeaController extends Controller
     public function update(IdeaRequest $request, Idea $idea): RedirectResponse
     {
         $this->authorize('update', $idea);
+
         $data = $request->validated();
+
         $data['links'] = explode("\n", $data['links']);
+
+        if ($request->hasFile('image')) {
+
+            // delete old image if exists
+            if ($idea->image_path) {
+                Storage::disk('public')->delete($idea->image_path);
+            }
+
+            // store new image
+            $data['image_path'] = $request
+                ->file('image')
+                ->store('ideas', 'public');
+        }
+
+        // remove non-db field
+        unset($data['image']);
+
         $idea->update($data);
-        return redirect()->back()->with('success', 'Idea updated successfully');
+
+        return redirect()
+            ->back()
+            ->with('success', 'Idea updated successfully');
     }
 
     public function destroy(Idea $idea): RedirectResponse
