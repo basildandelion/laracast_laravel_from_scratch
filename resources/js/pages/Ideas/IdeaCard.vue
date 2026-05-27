@@ -49,6 +49,8 @@ const changeStatus = (idea: Idea, status: string) => {
         status,
     });
     form.submit(ideas.status(idea.id), {
+        forceFormData: true,
+        preserveScroll: true,
         onSuccess: () => {
             statusModalOpened.value = false;
         },
