@@ -30,7 +30,8 @@ class IdeaController extends Controller
             : 'all';
 
         $ideas = $user->ideas()
-            ->when($requestedStatus !== 'all', fn ($query) => $query->where('status', $requestedStatus))->latest()
+            ->when($requestedStatus !== 'all', fn ($query) => $query->where('status', $requestedStatus))
+            ->latest()
             ->paginate(10);
 
         $counts = Idea::countByStatus($user);
@@ -78,14 +79,10 @@ class IdeaController extends Controller
         $idea['links'] = ! empty($data['links']) ? explode("\n", $data['links']) : [];
 
         if ($request->hasFile('image')) {
-
             // delete old image if exists
             if ($idea->image_path) {
                 Storage::disk('public')->delete($idea->image_path);
             }
-
-            //            TODO delete old image before updating
-            // store new image
             $data['image_path'] = $request
                 ->file('image')
                 ->store('ideas', 'public');
@@ -104,7 +101,10 @@ class IdeaController extends Controller
     public function destroy(Idea $idea): RedirectResponse
     {
         $this->authorize('delete', $idea);
-
+        // delete an image if exists
+        if ($idea->image_path) {
+            Storage::disk('public')->delete($idea->image_path);
+        }
         $idea->delete();
 
         return redirect()->route('ideas.index')->with('error', 'Idea deleted successfully.');
