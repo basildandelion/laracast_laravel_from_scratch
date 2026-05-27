@@ -126,11 +126,17 @@ const closeCreateForm = () => {
     </div>
 
     <Modal
+        v-if="createModalOpened"
         :open="createModalOpened"
         title="Create an Idea"
         @close="closeCreateForm"
     >
-        <IdeaForm :idea="idea.data" :statuses="statuses" formId="ideaForm" />
+        <IdeaForm
+            :idea="idea.data"
+            :statuses="statuses"
+            formId="ideaForm"
+            @close="closeCreateForm"
+        />
 
         <template #footer>
             <div class="flex">

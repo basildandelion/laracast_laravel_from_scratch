@@ -51,9 +51,11 @@ class IdeaController extends Controller
         ];
         $idea['links'] = ! empty($validated['links']) ? explode("\n", $validated['links']) : [];
 
-        $idea['image_path'] = $request
-            ->file('image')
-            ->store('ideas', 'public');
+        if (! empty($validated['image'])) {
+            $idea['image_path'] = $request
+                ->file('image')
+                ->store('ideas', 'public');
+        }
 
         Idea::create($idea);
 
@@ -82,7 +84,7 @@ class IdeaController extends Controller
                 Storage::disk('public')->delete($idea->image_path);
             }
 
-//            TODO delete old image before updating
+            //            TODO delete old image before updating
             // store new image
             $data['image_path'] = $request
                 ->file('image')

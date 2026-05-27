@@ -29,6 +29,10 @@ const props = defineProps<{
     formId: string;
 }>();
 
+const emit = defineEmits<{
+    close: [];
+}>();
+
 const form = useForm<{
     title: string | null;
     description: string | null;
@@ -40,21 +44,18 @@ const form = useForm<{
     title: props.idea.title ?? '',
     description: props.idea.description ?? '',
     image_path: props.idea.image_path ?? '',
-    links: props.idea.links.join('\n') ?? '',
+    links: props.idea.links?.join('\n') ?? '',
     status: props.idea.status ?? '',
     image: null,
 });
 
-const submitCreateForm = () => {
-    const route = props.idea.id
-        ? ideas.update(props.idea.id)
-        : ideas.store();
-    form.submit(route, {
+const submitIdeaForm = () => {
+    const route = props.idea.id ? ideas.update(props.idea.id) : ideas.store();
+    form.submit(route.method, route.url, {
         forceFormData: true,
         preserveScroll: true,
         onSuccess: () => {
-            // closeCreateForm();
-            // TODO show success message and hide modal with form
+            emit('close');
         },
     });
 };
@@ -114,10 +115,21 @@ const handleFile = (file: File | null) => {
     form.image = file;
     form.image_path = previewUrl;
 };
+const getImageUrl = () => {
+    if (!form.image_path) {
+        return '';
+    }
+
+    if (form.image_path.startsWith('blob:')) {
+        return form.image_path;
+    }
+
+    return `/storage/${form.image_path}`;
+};
 </script>
 
 <template>
-    <form :id="formId" @submit.prevent="submitCreateForm">
+    <form :id="formId" @submit.prevent="submitIdeaForm">
         <div class="space-y-12">
             <div class="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
                 <div class="col-span-full">
@@ -254,7 +266,7 @@ const handleFile = (file: File | null) => {
                         :style="
                             form.image_path
                                 ? {
-                                      backgroundImage: `url(/storage/${form.image_path})`,
+                                      backgroundImage: `url(${getImageUrl()})`,
                                   }
                                 : {}
                         "

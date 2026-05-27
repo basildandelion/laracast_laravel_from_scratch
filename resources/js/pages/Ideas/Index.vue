@@ -16,7 +16,7 @@ interface Idea {
     image_path: string | null;
     links: string[];
 }
-const newIdea: Idea = {
+const emptyIdea: Idea = {
     id: 0,
     title: null,
     description: null,
@@ -25,6 +25,7 @@ const newIdea: Idea = {
     image_path: null,
     links: [],
 };
+let editIdea = emptyIdea;
 
 interface PaginatedIdeas {
     data: Idea[];
@@ -70,7 +71,8 @@ defineProps<{
 
 const createModalOpened = ref(false);
 
-const showCreateForm = () => {
+const showCreateForm = (idea: Idea) => {
+    editIdea = idea;
     createModalOpened.value = true;
 };
 
@@ -81,75 +83,92 @@ const closeCreateForm = () => {
 
 <template>
     <Head title="your ideas" />
-    <header class="py-8 md:py-12">
-        <h1 class="text-3xl font-bold">Ideas</h1>
-        <p class="mt-2 text-sm text-muted-foreground">
-            Capture your thoughts. Make a plan.
-        </p>
-    </header>
+    <div>
+        <header class="py-8 md:py-12">
+            <h1 class="text-3xl font-bold">Ideas</h1>
+            <p class="mt-2 text-sm text-muted-foreground">
+                Capture your thoughts. Make a plan.
+            </p>
+        </header>
 
-    <div class="flex items-center justify-between">
-        <div class="flex gap-3">
-            <Link
-                v-for="status in Object.keys(counts)"
-                :key="status"
-                :test="status"
-                :href="
-                    ideas.index.url() +
-                    (status !== 'all' ? `?status=${status}` : '')
-                "
-                :class="
-                    `btn` + (status !== requestedStatus ? ' btn-outlined' : '')
-                "
-            >
-                {{ counts[status].name }}: {{ counts[status].value }}
-            </Link>
-        </div>
-        <button class="btn btn-outlined" type="button" @click="showCreateForm">
-            Create an Idea
-        </button>
-    </div>
-
-    <div class="mt-10">
-        <div
-            v-if="items.data.length"
-            class="grid gap-6 text-muted-foreground md:grid-cols-2"
-        >
-            <IdeaCard v-for="(idea, key) in items.data" :idea="idea" :key="key" />
-        </div>
-        <div v-else>No ideas at this time. Create new ones!</div>
-
-        <div v-if="items.meta.total > items.meta.per_page" class="mt-10">
-            <pagination
-                :meta="items.meta"
-                :requested-status="requestedStatus"
-                :links="items.links"
-            />
-        </div>
-    </div>
-
-    <Modal
-        :open="createModalOpened"
-        title="Create an Idea"
-        @close="closeCreateForm"
-    >
-        <IdeaForm :idea="newIdea" :statuses="statuses" formId="ideaForm" />
-
-        <template #footer>
-            <div class="flex">
-                <div class="gap-x-6">
-                    <button type="submit" form="ideaForm" class="btn">
-                        Create an Idea
-                    </button>
-                    <button
-                        type="button"
-                        class="btn btn-outlined"
-                        @click="closeCreateForm"
-                    >
-                        Cancel
-                    </button>
-                </div>
+        <div class="flex items-center justify-between">
+            <div class="flex gap-3">
+                <Link
+                    v-for="status in Object.keys(counts)"
+                    :key="status"
+                    :test="status"
+                    :href="
+                        ideas.index.url() +
+                        (status !== 'all' ? `?status=${status}` : '')
+                    "
+                    :class="
+                        `btn` +
+                        (status !== requestedStatus ? ' btn-outlined' : '')
+                    "
+                >
+                    {{ counts[status].name }}: {{ counts[status].value }}
+                </Link>
             </div>
-        </template>
-    </Modal>
+            <button
+                class="btn btn-outlined"
+                type="button"
+                @click="showCreateForm(emptyIdea)"
+            >
+                Create an Idea
+            </button>
+        </div>
+
+        <div class="mt-10">
+            <div
+                v-if="items.data.length"
+                class="grid gap-6 text-muted-foreground md:grid-cols-2"
+            >
+                <IdeaCard
+                    v-for="(idea, key) in items.data"
+                    :idea="idea"
+                    :key="key"
+                    @editItem="showCreateForm(idea)"
+                />
+            </div>
+            <div v-else>No ideas at this time. Create new ones!</div>
+
+            <div v-if="items.meta.total > items.meta.per_page" class="mt-10">
+                <pagination
+                    :meta="items.meta"
+                    :requested-status="requestedStatus"
+                    :links="items.links"
+                />
+            </div>
+        </div>
+
+        <Modal
+            :open="createModalOpened"
+            title="Create an Idea"
+            @close="closeCreateForm"
+        >
+            <IdeaForm
+                :idea="editIdea"
+                :statuses="statuses"
+                formId="ideaForm"
+                @close="closeCreateForm"
+            />
+
+            <template #footer>
+                <div class="flex">
+                    <div class="gap-x-6">
+                        <button type="submit" form="ideaForm" class="btn">
+                            Submit
+                        </button>
+                        <button
+                            type="button"
+                            class="btn btn-outlined"
+                            @click="closeCreateForm"
+                        >
+                            Cancel
+                        </button>
+                    </div>
+                </div>
+            </template>
+        </Modal>
+    </div>
 </template>
