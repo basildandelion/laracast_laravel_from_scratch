@@ -48,9 +48,12 @@ class IdeaController extends Controller
             'title' => $validated['title'],
             'description' => $validated['description'],
             'status' => $validated['status'],
-            'links' => explode("\n", $validated['links']),
-            'image_path' => $validated['image_path'],
         ];
+        $idea['links'] = ! empty($validated['links']) ? explode("\n", $validated['links']) : [];
+
+        $idea['image_path'] = $request
+            ->file('image')
+            ->store('ideas', 'public');
 
         Idea::create($idea);
 
@@ -70,8 +73,7 @@ class IdeaController extends Controller
         $this->authorize('update', $idea);
 
         $data = $request->validated();
-
-        $data['links'] = explode("\n", $data['links']);
+        $idea['links'] = ! empty($data['links']) ? explode("\n", $data['links']) : [];
 
         if ($request->hasFile('image')) {
 
@@ -80,6 +82,7 @@ class IdeaController extends Controller
                 Storage::disk('public')->delete($idea->image_path);
             }
 
+//            TODO delete old image before updating
             // store new image
             $data['image_path'] = $request
                 ->file('image')

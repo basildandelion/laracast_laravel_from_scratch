@@ -5,11 +5,12 @@ import ideas from '@/routes/ideas';
 
 interface Idea {
     id: number;
-    title: string;
-    description: string;
-    created_at: string;
+    title: string | null;
+    description: string | null;
+    created_at: string | null;
     status: string;
-    image_path: string;
+    image_path: string | null;
+    links: string[];
 }
 defineProps<{
     idea: Idea;
