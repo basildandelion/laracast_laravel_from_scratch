@@ -44,6 +44,26 @@ const showCreateForm = () => {
 const closeCreateForm = () => {
     createModalOpened.value = false;
 };
+const statusModalOpened = ref(false);
+const showChangeStatusModal = () => {
+    statusModalOpened.value = true;
+};
+const closeStatusForm = () => {
+    statusModalOpened.value = false;
+};
+const changeStatus = (idea: Idea, status: string) => {
+    const form = useForm<{
+        status: string;
+    }>({
+        status,
+    });
+    form.submit(ideas.status(idea.data.id), {
+        onSuccess: () => {
+            statusModalOpened.value = false;
+        },
+    });
+    statusModalOpened.value = false;
+};
 </script>
 
 <template>
@@ -69,7 +89,10 @@ const closeCreateForm = () => {
                 <div class="lg:pt-4 lg:pr-8">
                     <div :class="{ 'lg:max-w-lg': idea.data.image_path }">
                         <div class="mt-1">
-                            <StatusLabel :status="idea.data.status" />
+                            <StatusLabel
+                                @click.prevent="showChangeStatusModal()"
+                                :status="idea.data.status"
+                            />
                         </div>
                         <h1
                             class="mt-2 text-4xl font-semibold tracking-tight text-pretty text-white sm:text-5xl"
@@ -148,6 +171,35 @@ const closeCreateForm = () => {
                         type="button"
                         class="btn btn-outlined"
                         @click="closeCreateForm"
+                    >
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </template>
+    </Modal>
+
+    <Modal
+        :open="statusModalOpened"
+        v-if="statusModalOpened"
+        title="Change Idea Status"
+        @close="closeStatusForm"
+    >
+        <div class="flex gap-x-2">
+            <template v-for="(status, key) in statuses" :key="key">
+                <StatusLabel
+                    :status="status"
+                    @click="changeStatus(idea, status)"
+                />
+            </template>
+        </div>
+        <template #footer>
+            <div class="flex">
+                <div class="gap-x-6">
+                    <button
+                        type="button"
+                        class="btn btn-outlined"
+                        @click="closeStatusForm"
                     >
                         Cancel
                     </button>

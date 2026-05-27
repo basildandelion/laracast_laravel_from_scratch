@@ -22,7 +22,7 @@ const statusClasses = computed(() => {
 <template>
     <span
         :class="[
-            'tex-xs inline-block rounded-full border px-2 py-1 font-medium',
+            'tex-xs inline-block rounded-full border px-2 py-1 font-medium cursor-pointer',
             statusClasses,
         ]"
     >

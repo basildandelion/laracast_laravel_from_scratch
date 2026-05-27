@@ -127,6 +127,7 @@ const closeCreateForm = () => {
                     v-for="(idea, key) in items.data"
                     :idea="idea"
                     :key="key"
+                    :statuses
                     @editItem="showCreateForm(idea)"
                 />
             </div>

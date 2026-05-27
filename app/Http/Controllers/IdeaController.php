@@ -109,4 +109,15 @@ class IdeaController extends Controller
 
         return redirect()->route('ideas.index')->with('error', 'Idea deleted successfully.');
     }
+
+    public function updateStatus(Idea $idea, Request $request): RedirectResponse
+    {
+        if ($idea->status !== $request->status) {
+            $idea->update(['status' => $request->status]);
+        }
+
+        return redirect()
+            ->back()
+            ->with('success', 'Idea status updated successfully');
+    }
 }

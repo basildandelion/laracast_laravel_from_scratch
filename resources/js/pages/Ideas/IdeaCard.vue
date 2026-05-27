@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { TrashIcon, CogIcon } from '@heroicons/vue/20/solid';
 import { Link, useForm } from '@inertiajs/vue3';
+import { ref } from 'vue';
+import Modal from '@/pages/Ideas/Modal.vue';
 import StatusLabel from '@/pages/Ideas/StatusLabel.vue';
 import ideas from '@/routes/ideas';
 
@@ -15,6 +17,7 @@ interface Idea {
 }
 defineProps<{
     idea: Idea;
+    statuses: string[];
 }>();
 const emit = defineEmits<{
     editItem: [idea: Idea];
@@ -30,6 +33,27 @@ const deleteIdea = (ideaId: number) => {
         const route = ideas.destroy(ideaId);
         form.submit(route);
     }
+};
+
+const statusModalOpened = ref(false);
+const showChangeStatusModal = () => {
+    statusModalOpened.value = true;
+};
+const closeStatusForm = () => {
+    statusModalOpened.value = false;
+};
+const changeStatus = (idea: Idea, status: string) => {
+    const form = useForm<{
+        status: string;
+    }>({
+        status,
+    });
+    form.submit(ideas.status(idea.id), {
+        onSuccess: () => {
+            statusModalOpened.value = false;
+        },
+    });
+    statusModalOpened.value = false;
 };
 </script>
 
@@ -48,7 +72,10 @@ const deleteIdea = (ideaId: number) => {
                 {{ idea.title }}
             </h3>
             <div class="mt-1">
-                <StatusLabel :status="idea.status" />
+                <StatusLabel
+                    @click.prevent="showChangeStatusModal()"
+                    :status="idea.status"
+                />
             </div>
             <div class="mt-5 line-clamp-3">
                 {{ idea.description }}
@@ -83,4 +110,33 @@ const deleteIdea = (ideaId: number) => {
             </form>
         </div>
     </Link>
+
+    <Modal
+        :open="statusModalOpened"
+        v-if="statusModalOpened"
+        title="Change Idea Status"
+        @close="closeStatusForm"
+    >
+        <div class="flex gap-x-2">
+            <template v-for="(status, key) in statuses" :key="key">
+                <StatusLabel
+                    :status="status"
+                    @click="changeStatus(idea, status)"
+                />
+            </template>
+        </div>
+        <template #footer>
+            <div class="flex">
+                <div class="gap-x-6">
+                    <button
+                        type="button"
+                        class="btn btn-outlined"
+                        @click="closeStatusForm"
+                    >
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </template>
+    </Modal>
 </template>
