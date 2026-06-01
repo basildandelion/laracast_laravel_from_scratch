@@ -133,9 +133,6 @@ const getImageUrl = () => {
 </script>
 
 <template>
-    <pre>
-    {{ form }}
-    </pre>
     <form :id="formId" @submit.prevent="submitIdeaForm">
         <div class="space-y-12">
             <div class="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
@@ -158,6 +155,12 @@ const getImageUrl = () => {
                                 class="block min-w-0 grow bg-transparent py-1.5 pr-3 pl-1 text-base text-white placeholder:text-gray-500 focus:outline-none sm:text-sm/6"
                             />
                         </div>
+                        <p
+                            class="text-xs text-red-500"
+                            v-if="form.errors.title"
+                        >
+                            {{ form.errors.title }}
+                        </p>
                     </div>
                 </div>
                 <div class="col-span-full">
@@ -326,8 +329,14 @@ const getImageUrl = () => {
                         <div
                             v-for="(link, index) in form.links"
                             :key="index"
-                            class="flex items-center rounded-md bg-white/5 pl-3 outline-1 -outline-offset-1 outline-white/10 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-primary"
+                            class="flex flex-wrap items-center rounded-md bg-white/5 pl-3 outline-1 -outline-offset-1 outline-white/10 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-primary"
                         >
+                            <p
+                                class="text-xs text-red-500 w-full"
+                                v-if="form.errors['links.' + index]"
+                            >
+                                {{ form.errors['links.' + index] }}
+                            </p>
                             <input
                                 type="text"
                                 class="block min-w-0 grow bg-transparent py-1.5 pr-3 pl-1 text-base text-white placeholder:text-gray-500 focus:outline-none sm:text-sm/6"
