@@ -25,13 +25,15 @@ const emit = defineEmits<{
 
 const showCreateForm = (idea: Idea) => {
     emit('editItem', idea);
-    console.log('Show create form for idea:', idea);
 };
 const deleteIdea = (ideaId: number) => {
     if (confirm('Are you sure you want to delete this idea?')) {
         const form = useForm();
         const route = ideas.destroy(ideaId);
-        form.submit(route);
+        form.submit(route, {
+            forceFormData: true,
+            preserveScroll: true,
+        });
     }
 };
 

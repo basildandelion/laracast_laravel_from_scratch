@@ -118,7 +118,7 @@ const closeCreateForm = () => {
             </button>
         </div>
 
-        <div class="mt-10">
+        <div class="mt-10 mb-4">
             <div
                 v-if="items.data.length"
                 class="grid gap-6 text-muted-foreground md:grid-cols-2"
