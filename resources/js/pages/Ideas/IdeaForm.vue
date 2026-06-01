@@ -7,8 +7,12 @@ import {
     ListboxOptions,
 } from '@headlessui/vue';
 import { ChevronUpDownIcon } from '@heroicons/vue/16/solid';
-import { CheckIcon } from '@heroicons/vue/20/solid';
-import { PhotoIcon } from '@heroicons/vue/24/solid';
+import {
+    CheckIcon,
+    PhotoIcon,
+    TrashIcon,
+    PlusIcon,
+} from '@heroicons/vue/20/solid';
 import { useForm } from '@inertiajs/vue3';
 import { ref } from 'vue';
 import ideas from '@/routes/ideas';
@@ -37,15 +41,15 @@ const form = useForm<{
     title: string | null;
     description: string | null;
     image_path: string | null;
-    links: string | null;
+    links: Array<string>;
     status: string | null;
     image: File | null;
 }>({
     title: props.idea.title ?? '',
     description: props.idea.description ?? '',
     image_path: props.idea.image_path ?? '',
-    links: props.idea.links?.join('\n') ?? '',
-    status: props.idea.status ?? '',
+    links: props.idea.links ?? [],
+    status: props.idea.status,
     image: null,
 });
 
@@ -129,6 +133,9 @@ const getImageUrl = () => {
 </script>
 
 <template>
+    <pre>
+    {{ form }}
+    </pre>
     <form :id="formId" @submit.prevent="submitIdeaForm">
         <div class="space-y-12">
             <div class="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
@@ -311,22 +318,38 @@ const getImageUrl = () => {
                 </div>
                 <div class="col-span-full">
                     <label
-                        for="about"
+                        for="links"
                         class="block text-sm/6 font-medium text-white"
                         >Links</label
                     >
-                    <div class="mt-2">
-                        <textarea
-                            id="about"
-                            name="about"
-                            rows="3"
-                            v-model="form.links"
-                            class="block w-full rounded-md bg-white/5 px-3 py-1.5 text-base text-white outline-1 -outline-offset-1 outline-white/10 placeholder:text-gray-500 focus:outline-2 focus:-outline-offset-2 focus:outline-primary sm:text-sm/6"
-                        ></textarea>
+                    <div class="mt-2 flex flex-col gap-2">
+                        <div
+                            v-for="(link, index) in form.links"
+                            :key="index"
+                            class="flex items-center rounded-md bg-white/5 pl-3 outline-1 -outline-offset-1 outline-white/10 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-primary"
+                        >
+                            <input
+                                type="text"
+                                class="block min-w-0 grow bg-transparent py-1.5 pr-3 pl-1 text-base text-white placeholder:text-gray-500 focus:outline-none sm:text-sm/6"
+                                :value="link"
+                                @input="form.links[index] = $event.target.value"
+                            />
+                            <button
+                                type="button"
+                                @click="form.links.splice(index, 1)"
+                            >
+                                <TrashIcon class="size-5" aria-hidden="true" />
+                            </button>
+                        </div>
+                        <button
+                            class="btn flex justify-center"
+                            type="button"
+                            @click="form.links.push('')"
+                        >
+                            <PlusIcon class="size-5" aria-hidden="true" />
+                            Add Link
+                        </button>
                     </div>
-                    <p class="mt-3 text-sm/6 text-gray-400">
-                        Each link should be on a new line.
-                    </p>
                 </div>
             </div>
         </div>

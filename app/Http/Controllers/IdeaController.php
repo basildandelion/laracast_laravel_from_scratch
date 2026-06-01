@@ -50,7 +50,7 @@ class IdeaController extends Controller
             'description' => $validated['description'],
             'status' => $validated['status'],
         ];
-        $idea['links'] = ! empty($validated['links']) ? explode("\n", $validated['links']) : [];
+        $idea['links'] = ! empty($validated['links']) ? $validated['links'] : [];
 
         if (! empty($validated['image'])) {
             $idea['image_path'] = $request
@@ -76,7 +76,7 @@ class IdeaController extends Controller
         $this->authorize('update', $idea);
 
         $data = $request->validated();
-        $idea['links'] = ! empty($data['links']) ? explode("\n", $data['links']) : [];
+        $idea['links'] = ! empty($data['links']) ? $data['links'] : [];
 
         if ($request->hasFile('image')) {
             // delete old image if exists
