@@ -6,6 +6,7 @@ import Modal from '@/pages/Ideas/Modal.vue';
 import StatusLabel from '@/pages/Ideas/StatusLabel.vue';
 import ideas from '@/routes/ideas';
 import IdeaForm from './IdeaForm.vue';
+import Steps from './Steps.vue';
 
 interface Data {
     id: number;
@@ -16,6 +17,14 @@ interface Data {
     links: Array<string>;
     image_path: string;
 }
+interface Steps {
+    id: number;
+    idea_id: number;
+    completed: boolean;
+    description: string;
+    created_at: string;
+    updated_at: string;
+}
 
 interface Idea {
     data: Data;
@@ -23,6 +32,7 @@ interface Idea {
 
 const props = defineProps<{
     idea: Idea;
+    steps: Steps[];
     statuses: string[];
 }>();
 
@@ -105,6 +115,7 @@ const changeStatus = (idea: Idea, status: string) => {
                         <div class="mt-4">
                             {{ idea.data.created_at }}
                         </div>
+                        <Steps :steps="steps" />
                         <div v-if="idea.data.links" class="my-6">
                             <ul class="flex flex-col gap-2">
                                 <li v-for="link in idea.data.links" :key="link">

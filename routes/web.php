@@ -22,4 +22,5 @@ Route::middleware('auth')->group(function () {
     Route::post('logout', [RegisteredUserController::class, 'logout'])->name('logout');
     Route::resource('ideas', IdeaController::class);
     Route::patch('ideas/{idea}/status', [IdeaController::class, 'updateStatus'])->name('ideas.status');
+    Route::patch('ideas/{idea}/step/{stepId}/complete', [IdeaController::class, 'updateStepCompletion'])->name('ideas.step.complete');
 });

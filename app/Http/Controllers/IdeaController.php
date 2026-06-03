@@ -67,8 +67,9 @@ class IdeaController extends Controller
     {
         $this->authorize('view', $idea);
         $statuses = IdeaStatus::cases();
+        $steps = $idea->steps()->get();
 
-        return Inertia::render('Ideas/Show', ['idea' => new IdeaResource($idea), 'statuses' => $statuses]);
+        return Inertia::render('Ideas/Show', ['idea' => new IdeaResource($idea), 'statuses' => $statuses, 'steps' => $steps]);
     }
 
     public function update(IdeaRequest $request, Idea $idea): RedirectResponse
@@ -119,5 +120,18 @@ class IdeaController extends Controller
         return redirect()
             ->back()
             ->with('success', 'Idea status updated successfully');
+    }
+
+    public function updateStepCompletion(Idea $idea, int $stepId): RedirectResponse
+    {
+        $this->authorize('update', $idea);
+        $step = $idea->steps()->find($stepId);
+        if (!$step) {
+            abort(404);
+        }
+        $step->update(['completed' => ! $step->completed]);
+        return redirect()
+            ->back()
+            ->with('success', 'Step completion updated successfully');
     }
 }
