@@ -8,10 +8,10 @@ use App\Enums\IdeaStatus;
 use App\Http\Requests\IdeaRequest;
 use App\Http\Resources\IdeaResource;
 use App\Models\Idea;
+use App\Services\IdeaService;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -20,22 +20,18 @@ class IdeaController extends Controller
 {
     use AuthorizesRequests;
 
+    private $ideaService;
+
+    public function __construct(IdeaService $ideaService)
+    {
+        $this->ideaService = $ideaService;
+    }
+
     public function index(Request $request): Response
     {
         $this->authorize('viewAny', Idea::class);
-        $user = Auth::user();
-        $status = $request->query('status');
-        $requestedStatus = is_string($status) && in_array($status, IdeaStatus::values(), true)
-            ? $status
-            : 'all';
 
-        $ideas = $user->ideas()
-            ->when($requestedStatus !== 'all', fn ($query) => $query->where('status', $requestedStatus))
-            ->latest()
-            ->paginate(10);
-
-        $counts = Idea::countByStatus($user);
-        $statuses = IdeaStatus::cases();
+        [$ideas, $counts, $requestedStatus, $statuses] = $this->ideaService->getIdeas($request);
 
         return Inertia::render('Ideas/Index', ['items' => IdeaResource::collection($ideas), 'counts' => $counts, 'requestedStatus' => $requestedStatus, 'statuses' => $statuses]);
     }
@@ -44,21 +40,8 @@ class IdeaController extends Controller
     {
         $this->authorize('create', Idea::class);
         $validated = $request->validated();
-        $idea = [
-            'user_id' => Auth::id(),
-            'title' => $validated['title'],
-            'description' => $validated['description'],
-            'status' => $validated['status'],
-        ];
-        $idea['links'] = ! empty($validated['links']) ? $validated['links'] : [];
 
-        if (! empty($validated['image'])) {
-            $idea['image_path'] = $request
-                ->file('image')
-                ->store('ideas', 'public');
-        }
-
-        Idea::create($idea);
+        $this->ideaService->createOrUpdateIdea($validated);
 
         return redirect()->route('ideas.index')->with('success', 'Idea created successfully.');
     }
@@ -94,6 +77,12 @@ class IdeaController extends Controller
 
         $idea->update($data);
 
+        $steps = $request->only('steps');
+
+        if ($steps) {
+            dd($steps['steps']);
+        }
+
         return redirect()
             ->back()
             ->with('success', 'Idea updated successfully');
@@ -126,10 +115,11 @@ class IdeaController extends Controller
     {
         $this->authorize('update', $idea);
         $step = $idea->steps()->find($stepId);
-        if (!$step) {
+        if (! $step) {
             abort(404);
         }
         $step->update(['completed' => ! $step->completed]);
+
         return redirect()
             ->back()
             ->with('success', 'Step completion updated successfully');

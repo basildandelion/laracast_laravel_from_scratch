@@ -19,6 +19,7 @@ class IdeaRequest extends FormRequest
             'links.*' => ['url', 'max:255'],
             'status' => ['required', Rule::enum(IdeaStatus::class)],
             'image' => ['nullable', 'image', 'max:10240'],
+            'steps' => ['nullable', 'array'],
         ];
     }
 

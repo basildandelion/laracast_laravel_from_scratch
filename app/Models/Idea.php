@@ -20,6 +20,7 @@ use Override;
     'links',
     'status',
     'image_path',
+    'steps',
 ])]
 class Idea extends Model
 {

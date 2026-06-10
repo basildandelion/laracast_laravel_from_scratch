@@ -16,7 +16,14 @@ import {
 import { useForm } from '@inertiajs/vue3';
 import { ref } from 'vue';
 import ideas from '@/routes/ideas';
-
+interface Step {
+    id: number | null;
+    idea_id: number | null;
+    completed: boolean;
+    description: string;
+    created_at: string;
+    updated_at: string;
+}
 interface Idea {
     id: number | null;
     title: string | null;
@@ -31,6 +38,7 @@ const props = defineProps<{
     idea: Idea;
     statuses: string[];
     formId: string;
+    steps: Step[] | null;
 }>();
 
 const emit = defineEmits<{
@@ -44,6 +52,7 @@ const form = useForm<{
     links: Array<string>;
     status: string | null;
     image: File | null;
+    steps: Step[];
 }>({
     title: props.idea.title ?? '',
     description: props.idea.description ?? '',
@@ -51,6 +60,15 @@ const form = useForm<{
     links: props.idea.links ?? [],
     status: props.idea.status,
     image: null,
+    steps: props.steps ?? [],
+});
+const createStep = () => ({
+    id: null,
+    description: '',
+    completed: false,
+    idea_id: props.idea.id,
+    created_at: '',
+    updated_at: '',
 });
 
 const submitIdeaForm = () => {
@@ -332,7 +350,7 @@ const getImageUrl = () => {
                             class="flex flex-wrap items-center rounded-md bg-white/5 pl-3 outline-1 -outline-offset-1 outline-white/10 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-primary"
                         >
                             <p
-                                class="text-xs text-red-500 w-full"
+                                class="w-full text-xs text-red-500"
                                 v-if="form.errors['links.' + index]"
                             >
                                 {{ form.errors['links.' + index] }}
@@ -357,6 +375,56 @@ const getImageUrl = () => {
                         >
                             <PlusIcon class="size-5" aria-hidden="true" />
                             Add Link
+                        </button>
+                    </div>
+                </div>
+
+                <div class="col-span-full">
+                    <label
+                        for="steps"
+                        class="block text-sm/6 font-medium text-white"
+                        >Steps</label
+                    >
+                    <div class="mt-2 flex flex-col gap-2">
+                        <pre>
+                            {{ form.steps }}
+                        </pre>
+                        <div
+                            v-for="(step, index) in form.steps"
+                            :key="index"
+                            class="flex flex-wrap items-center rounded-md bg-white/5 pl-3 outline-1 -outline-offset-1 outline-white/10 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-primary"
+                        >
+                            <p
+                                class="w-full text-xs text-red-500"
+                                v-if="form.errors['steps.' + index]"
+                            >
+                                {{ form.errors['steps.' + index] }}
+                            </p>
+                            <input
+                                type="checkbox"
+                                :checked="step.completed"
+                                @change="step.completed = !step.completed"
+                            />
+                            <input
+                                type="text"
+                                class="block min-w-0 grow bg-transparent py-1.5 pr-3 pl-1 text-base text-white placeholder:text-gray-500 focus:outline-none sm:text-sm/6"
+                                :value="step.description"
+                                @input="step.description = $event.target.value"
+                            />
+                            <button
+                                type="button"
+                                @click="form.steps.splice(index, 1)"
+                            >
+                                <TrashIcon class="size-5" aria-hidden="true" />
+                            </button>
+                        </div>
+                        <button
+                            class="btn flex justify-center"
+                            type="button"
+                            @click="form.steps.push(createStep())"
+                        >
+                            <PlusIcon class="size-5" aria-hidden="true" />
+                            Add Step
                         </button>
                     </div>
                 </div>

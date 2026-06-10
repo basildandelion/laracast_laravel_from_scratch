@@ -168,6 +168,7 @@ const changeStatus = (idea: Idea, status: string) => {
         <IdeaForm
             :idea="idea.data"
             :statuses="statuses"
+            :steps="steps"
             formId="ideaForm"
             @close="closeCreateForm"
         />
