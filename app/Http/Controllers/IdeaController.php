@@ -60,28 +60,8 @@ class IdeaController extends Controller
         $this->authorize('update', $idea);
 
         $data = $request->validated();
-        $idea['links'] = ! empty($data['links']) ? $data['links'] : [];
 
-        if ($request->hasFile('image')) {
-            // delete old image if exists
-            if ($idea->image_path) {
-                Storage::disk('public')->delete($idea->image_path);
-            }
-            $data['image_path'] = $request
-                ->file('image')
-                ->store('ideas', 'public');
-        }
-
-        // remove non-db field
-        unset($data['image']);
-
-        $idea->update($data);
-
-        $steps = $request->only('steps');
-
-        if ($steps) {
-            dd($steps['steps']);
-        }
+        $this->ideaService->createOrUpdateIdea($data, $idea);
 
         return redirect()
             ->back()

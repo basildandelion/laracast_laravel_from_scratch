@@ -31,7 +31,7 @@ class IdeaService
 
     public function createOrUpdateIdea(array $data, ?Idea $idea = null): Idea
     {
-        if (! $idea) {
+        if (!$idea) {
             return $this->createIdea($data);
         }
 
@@ -41,6 +41,15 @@ class IdeaService
         if (! empty($data['image'])) {
             $idea['image_path'] = $this->storeImage($data['image']);
         }
+        $idea->update([
+            'title' => $data['title'],
+            'description' => $data['description'],
+            'status' => $data['status'],
+            'links' => ! empty($data['links']) ? $data['links'] : [],
+        ]);
+        $this->createOrUpdateIdeaSteps($idea, $data['steps'] ?? []);
+
+        return $idea;
     }
 
     private function createIdea(array $data): Idea

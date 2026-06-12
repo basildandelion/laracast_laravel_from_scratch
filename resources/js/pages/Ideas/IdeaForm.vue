@@ -386,9 +386,6 @@ const getImageUrl = () => {
                         >Steps</label
                     >
                     <div class="mt-2 flex flex-col gap-2">
-                        <pre>
-                            {{ form.steps }}
-                        </pre>
                         <div
                             v-for="(step, index) in form.steps"
                             :key="index"
