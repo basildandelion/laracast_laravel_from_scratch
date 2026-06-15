@@ -70,11 +70,13 @@ class IdeaController extends Controller
 
     public function destroy(Idea $idea): RedirectResponse
     {
+
         $this->authorize('delete', $idea);
         // delete an image if exists
         if ($idea->image_path) {
             Storage::disk('public')->delete($idea->image_path);
         }
+        $idea->steps()->delete();
         $idea->delete();
 
         return redirect()->route('ideas.index')->with('error', 'Idea deleted successfully.');
